@@ -18,8 +18,10 @@
             <div class="form-group" v-for="(input,k) in inputs" :key="k">
                 <input type="text" class="form-control" placeholder="Telephone" v-model="input.name">
                 <span>
-        <i class="fa fa-minus" @click="remove(k)" v-show="k || ( !k && inputs.length > 1)"></i>
-        <i class="fa fa-plus" @click="add(k)" v-show="k == inputs.length-1"></i>
+        <i class="fa fa-minus pull-right" style="color: red;border: 1px solid;padding: 4px;border-radius: 50%;"
+           @click="remove(k)" v-show="k || ( !k && inputs.length > 1)"></i>
+        <i class="fa fa-plus pull-right" style="color: green;border: 1px solid;padding: 4px;border-radius: 50%;"
+           @click="add(k)" v-show="k == inputs.length-1"></i>
     </span>
             </div>
 
@@ -58,7 +60,11 @@
                 <td>{{ customer.name }}</td>
                 <td>{{ customer.nic }}</td>
                 <td>{{ customer.address }}</td>
-                <td>{{ customer.telephone }}</td>
+                <td>
+                    <ul v-for="telephoneDetails in customer.telephones">
+                        <li>{{ telephoneDetails.telephone }}</li>
+                    </ul>
+                </td>
                 <td><a href="#" @click="editCustomer(customer)">Edit</a></td>
                 <td><a href="#" @click="deleteCustomer(customer.id)">Delete</a></td>
             </tr>
@@ -83,7 +89,7 @@
                     name: '',
                     nic: '',
                     address: '',
-                    telephone: '',
+                    telephones: [],
                 },
                 customer_id: '',
                 pagination: {},
@@ -96,7 +102,7 @@
 
         methods: {
             add(index) {
-                this.inputs.push({ name: '' });
+                this.inputs.push({name: ''});
             },
             remove(index) {
                 this.inputs.splice(index, 1);
@@ -108,6 +114,7 @@
                     .then(res => res.json())
                     .then(res => {
                         this.customerRecords = res.data;
+                        console.log(res.data[0]['telephones'][0]['telephone']);
                         vm.makePagination(res.meta, res.links);
                     })
                     .catch(err => console.log(err));
@@ -150,8 +157,7 @@
                             this.customerRecord.name = '';
                             this.customerRecord.nic = '';
                             this.customerRecord.address = '';
-                            this.customerRecord.telephone = '';
-                            this.inputs = [ {name: ''}];
+                            this.inputs = [{name: ''}];
                             alert('Customer Record Successfully Added!')
                             this.fetchCustomerRecords();
                         })
@@ -161,7 +167,7 @@
 
                     fetch(`api/customer/${this.customerRecord.id}`, {
                         method: 'put',
-                        body: JSON.stringify(this.customerRecord),
+                        body: JSON.stringify([this.customerRecord, this.inputs]),
                         headers: {
                             'content-type': 'application/json'
                         }
@@ -171,7 +177,7 @@
                             this.customerRecord.name = '';
                             this.customerRecord.nic = '';
                             this.customerRecord.address = '';
-                            this.customerRecord.telephone = '';
+                            this.inputs = [{name: ''}];
                             alert('Customer Record Successfully Updated!')
                             this.fetchCustomerRecords();
                         })
@@ -185,7 +191,19 @@
                 this.customerRecord.name = customerRecord.name;
                 this.customerRecord.nic = customerRecord.nic;
                 this.customerRecord.address = customerRecord.address;
-                this.customerRecord.telephone = customerRecord.telephone;
+                this.inputs = customerRecord.telephones.length === 0 ?
+                    [{name: ''}] :
+                    customerRecord.telephones.length === 1 ?
+                        [{name: customerRecord.telephones[0]['telephone']}] :
+                        customerRecord.telephones.length === 2 ?
+                            [{name: customerRecord.telephones[0]['telephone']}, {name: customerRecord.telephones[1]['telephone']}] :
+                            customerRecord.telephones.length === 3 ?
+                                [{name: customerRecord.telephones[0]['telephone']}, {name: customerRecord.telephones[1]['telephone']}, {name: customerRecord.telephones[2]['telephone']}] :
+                                customerRecord.telephones.length === 4 ?
+                                    [{name: customerRecord.telephones[0]['telephone']}, {name: customerRecord.telephones[1]['telephone']}, {name: customerRecord.telephones[2]['telephone']}, {name: customerRecord.telephones[3]['telephone']}] :
+                                    customerRecord.telephones.length === 5 ?
+                                        [{name: customerRecord.telephones[0]['telephone']}, {name: customerRecord.telephones[1]['telephone']}, {name: customerRecord.telephones[2]['telephone']}, {name: customerRecord.telephones[3]['telephone']}, {name: customerRecord.telephones[4]['telephone']}] :
+                                        [{name: ''}];
             }
         },
 

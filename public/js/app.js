@@ -1771,6 +1771,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -1784,7 +1785,7 @@ __webpack_require__.r(__webpack_exports__);
         name: '',
         nic: '',
         address: '',
-        telephone: ''
+        telephones: []
       },
       customer_id: '',
       pagination: {},
@@ -1812,6 +1813,7 @@ __webpack_require__.r(__webpack_exports__);
         return res.json();
       }).then(function (res) {
         _this.customerRecords = res.data;
+        console.log(res.data[0]['telephones'][0]['telephone']);
         vm.makePagination(res.meta, res.links);
       })["catch"](function (err) {
         return console.log(err);
@@ -1860,7 +1862,6 @@ __webpack_require__.r(__webpack_exports__);
           _this3.customerRecord.name = '';
           _this3.customerRecord.nic = '';
           _this3.customerRecord.address = '';
-          _this3.customerRecord.telephone = '';
           _this3.inputs = [{
             name: ''
           }];
@@ -1874,7 +1875,7 @@ __webpack_require__.r(__webpack_exports__);
         //update
         fetch("api/customer/".concat(this.customerRecord.id), {
           method: 'put',
-          body: JSON.stringify(this.customerRecord),
+          body: JSON.stringify([this.customerRecord, this.inputs]),
           headers: {
             'content-type': 'application/json'
           }
@@ -1884,7 +1885,9 @@ __webpack_require__.r(__webpack_exports__);
           _this3.customerRecord.name = '';
           _this3.customerRecord.nic = '';
           _this3.customerRecord.address = '';
-          _this3.customerRecord.telephone = '';
+          _this3.inputs = [{
+            name: ''
+          }];
           alert('Customer Record Successfully Updated!');
 
           _this3.fetchCustomerRecords();
@@ -1900,7 +1903,41 @@ __webpack_require__.r(__webpack_exports__);
       this.customerRecord.name = customerRecord.name;
       this.customerRecord.nic = customerRecord.nic;
       this.customerRecord.address = customerRecord.address;
-      this.customerRecord.telephone = customerRecord.telephone;
+      this.inputs = customerRecord.telephones.length === 0 ? [{
+        name: ''
+      }] : customerRecord.telephones.length === 1 ? [{
+        name: customerRecord.telephones[0]['telephone']
+      }] : customerRecord.telephones.length === 2 ? [{
+        name: customerRecord.telephones[0]['telephone']
+      }, {
+        name: customerRecord.telephones[1]['telephone']
+      }] : customerRecord.telephones.length === 3 ? [{
+        name: customerRecord.telephones[0]['telephone']
+      }, {
+        name: customerRecord.telephones[1]['telephone']
+      }, {
+        name: customerRecord.telephones[2]['telephone']
+      }] : customerRecord.telephones.length === 4 ? [{
+        name: customerRecord.telephones[0]['telephone']
+      }, {
+        name: customerRecord.telephones[1]['telephone']
+      }, {
+        name: customerRecord.telephones[2]['telephone']
+      }, {
+        name: customerRecord.telephones[3]['telephone']
+      }] : customerRecord.telephones.length === 5 ? [{
+        name: customerRecord.telephones[0]['telephone']
+      }, {
+        name: customerRecord.telephones[1]['telephone']
+      }, {
+        name: customerRecord.telephones[2]['telephone']
+      }, {
+        name: customerRecord.telephones[3]['telephone']
+      }, {
+        name: customerRecord.telephones[4]['telephone']
+      }] : [{
+        name: ''
+      }];
     }
   }
 });
@@ -37355,7 +37392,13 @@ var render = function() {
                     expression: "k || ( !k && inputs.length > 1)"
                   }
                 ],
-                staticClass: "fa fa-minus",
+                staticClass: "fa fa-minus pull-right",
+                staticStyle: {
+                  color: "red",
+                  border: "1px solid",
+                  padding: "4px",
+                  "border-radius": "50%"
+                },
                 on: {
                   click: function($event) {
                     return _vm.remove(k)
@@ -37372,7 +37415,13 @@ var render = function() {
                     expression: "k == inputs.length-1"
                   }
                 ],
-                staticClass: "fa fa-plus",
+                staticClass: "fa fa-plus pull-right",
+                staticStyle: {
+                  color: "green",
+                  border: "1px solid",
+                  padding: "4px",
+                  "border-radius": "50%"
+                },
                 on: {
                   click: function($event) {
                     return _vm.add(k)
@@ -37476,7 +37525,15 @@ var render = function() {
             _vm._v(" "),
             _c("td", [_vm._v(_vm._s(customer.address))]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(customer.telephone))]),
+            _c(
+              "td",
+              _vm._l(customer.telephones, function(telephoneDetails) {
+                return _c("ul", [
+                  _c("li", [_vm._v(_vm._s(telephoneDetails.telephone))])
+                ])
+              }),
+              0
+            ),
             _vm._v(" "),
             _c("td", [
               _c(
