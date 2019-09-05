@@ -14,10 +14,13 @@
                 <input type="text" class="form-control" placeholder="Address"
                        v-model="customerRecord.address">
             </div>
-
-            <div class="form-group">
-                <input type="text" class="form-control" placeholder="Telephone"
-                       v-model="customerRecord.telephone">
+            <label>Telephone numbers</label>
+            <div class="form-group" v-for="(input,k) in inputs" :key="k">
+                <input type="text" class="form-control" placeholder="Telephone" v-model="input.name">
+                <span>
+        <i class="fa fa-minus" @click="remove(k)" v-show="k || ( !k && inputs.length > 1)"></i>
+        <i class="fa fa-plus" @click="add(k)" v-show="k == inputs.length-1"></i>
+    </span>
             </div>
 
             <button type="submit" class="btn btn-light btn-block">Save</button>
@@ -70,6 +73,11 @@
             return {
                 search: '',
                 customerRecords: [],
+                inputs: [
+                    {
+                        name: ''
+                    }
+                ],
                 customerRecord: {
                     id: '',
                     name: '',
@@ -87,6 +95,12 @@
         },
 
         methods: {
+            add(index) {
+                this.inputs.push({ name: '' });
+            },
+            remove(index) {
+                this.inputs.splice(index, 1);
+            },
             fetchCustomerRecords(page_url) {
                 let vm = this;
                 page_url = page_url || 'api/customer';
@@ -121,12 +135,12 @@
                         .catch(err => console.log(err))
                 }
             },
-            addCustomerRecord(){
-                if (this.edit === false){
+            addCustomerRecord() {
+                if (this.edit === false) {
                     //add
                     fetch('api/customer', {
                         method: 'post',
-                        body: JSON.stringify(this.customerRecord),
+                        body: JSON.stringify([this.customerRecord, this.inputs]),
                         headers: {
                             'content-type': 'application/json'
                         }
@@ -137,11 +151,12 @@
                             this.customerRecord.nic = '';
                             this.customerRecord.address = '';
                             this.customerRecord.telephone = '';
+                            this.inputs = [ {name: ''}];
                             alert('Customer Record Successfully Added!')
                             this.fetchCustomerRecords();
                         })
                         .catch(err => console.log(err));
-                } else{
+                } else {
                     //update
 
                     fetch(`api/customer/${this.customerRecord.id}`, {
@@ -163,7 +178,7 @@
                         .catch(err => console.log(err));
                 }
             },
-            editCustomer(customerRecord){
+            editCustomer(customerRecord) {
                 this.edit = true;
                 this.customerRecord.id = customerRecord.id;
                 this.customerRecord.customer_id = customerRecord.id;

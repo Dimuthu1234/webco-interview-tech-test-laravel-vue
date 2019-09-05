@@ -1763,11 +1763,22 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       search: '',
       customerRecords: [],
+      inputs: [{
+        name: ''
+      }],
       customerRecord: {
         id: '',
         name: '',
@@ -1784,6 +1795,14 @@ __webpack_require__.r(__webpack_exports__);
     this.fetchCustomerRecords();
   },
   methods: {
+    add: function add(index) {
+      this.inputs.push({
+        name: ''
+      });
+    },
+    remove: function remove(index) {
+      this.inputs.splice(index, 1);
+    },
     fetchCustomerRecords: function fetchCustomerRecords(page_url) {
       var _this = this;
 
@@ -1831,7 +1850,7 @@ __webpack_require__.r(__webpack_exports__);
         //add
         fetch('api/customer', {
           method: 'post',
-          body: JSON.stringify(this.customerRecord),
+          body: JSON.stringify([this.customerRecord, this.inputs]),
           headers: {
             'content-type': 'application/json'
           }
@@ -1842,6 +1861,9 @@ __webpack_require__.r(__webpack_exports__);
           _this3.customerRecord.nic = '';
           _this3.customerRecord.address = '';
           _this3.customerRecord.telephone = '';
+          _this3.inputs = [{
+            name: ''
+          }];
           alert('Customer Record Successfully Added!');
 
           _this3.fetchCustomerRecords();
@@ -37297,36 +37319,77 @@ var render = function() {
           })
         ]),
         _vm._v(" "),
-        _c("div", { staticClass: "form-group" }, [
-          _c("input", {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.customerRecord.telephone,
-                expression: "customerRecord.telephone"
-              }
-            ],
-            staticClass: "form-control",
-            attrs: { type: "text", placeholder: "Telephone" },
-            domProps: { value: _vm.customerRecord.telephone },
-            on: {
-              input: function($event) {
-                if ($event.target.composing) {
-                  return
+        _c("label", [_vm._v("Telephone numbers")]),
+        _vm._v(" "),
+        _vm._l(_vm.inputs, function(input, k) {
+          return _c("div", { key: k, staticClass: "form-group" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: input.name,
+                  expression: "input.name"
                 }
-                _vm.$set(_vm.customerRecord, "telephone", $event.target.value)
+              ],
+              staticClass: "form-control",
+              attrs: { type: "text", placeholder: "Telephone" },
+              domProps: { value: input.name },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(input, "name", $event.target.value)
+                }
               }
-            }
-          })
-        ]),
+            }),
+            _vm._v(" "),
+            _c("span", [
+              _c("i", {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: k || (!k && _vm.inputs.length > 1),
+                    expression: "k || ( !k && inputs.length > 1)"
+                  }
+                ],
+                staticClass: "fa fa-minus",
+                on: {
+                  click: function($event) {
+                    return _vm.remove(k)
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("i", {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: k == _vm.inputs.length - 1,
+                    expression: "k == inputs.length-1"
+                  }
+                ],
+                staticClass: "fa fa-plus",
+                on: {
+                  click: function($event) {
+                    return _vm.add(k)
+                  }
+                }
+              })
+            ])
+          ])
+        }),
         _vm._v(" "),
         _c(
           "button",
           { staticClass: "btn btn-light btn-block", attrs: { type: "submit" } },
           [_vm._v("Save")]
         )
-      ]
+      ],
+      2
     ),
     _vm._v(" "),
     _c("nav", { attrs: { "aria-label": "Page navigation example" } }, [
